@@ -169,6 +169,7 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
+  p->mask = 0;
 }
 
 // Create a user page table for a given process, with no user memory,
@@ -309,6 +310,8 @@ fork(void)
   np->cwd = idup(p->cwd);
 
   safestrcpy(np->name, p->name, sizeof(p->name));
+
+  np->mask = p->mask;
 
   pid = np->pid;
 
@@ -692,4 +695,14 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+
+int
+trace(int mask){
+  if (mask & (1 << 31)){
+    return -1;
+  }
+  struct proc *p = myproc();
+  p->mask = mask;
+  return 0;
 }
