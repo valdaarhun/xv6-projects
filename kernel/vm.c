@@ -5,6 +5,9 @@
 #include "riscv.h"
 #include "defs.h"
 #include "fs.h"
+#include "spinlock.h"
+#include "proc.h"
+#include "sysinfo.h"
 
 /*
  * the kernel's page table.
@@ -448,4 +451,19 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
   } else {
     return -1;
   }
+}
+
+int
+sinfo(uint64 vaddr)
+{
+  struct proc *p = myproc();
+  struct sysinfo sinfo;
+
+  sinfo.freemem = kfreememsize();
+  sinfo.nproc = proc_notunusednum();
+
+  if(copyout(p->pagetable, vaddr, (char *)&sinfo, sizeof(sinfo)) < 0){
+    return -1;
+  }
+  return 0;
 }

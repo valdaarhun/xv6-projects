@@ -216,6 +216,21 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
   uvmfree(pagetable, sz);
 }
 
+// Find number of procs whose state is not "unused".
+int
+proc_notunusednum(void){
+  int num = 0;
+  struct proc *p;
+  for(p = proc; p < &proc[NPROC]; p++){
+    acquire(&p->lock);
+    if (p->state != UNUSED){
+      num++;
+    }
+    release(&p->lock);
+  }
+  return num;
+}
+
 // a user program that calls exec("/init")
 // assembled from ../user/initcode.S
 // od -t xC ../user/initcode

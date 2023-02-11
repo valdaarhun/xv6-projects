@@ -99,3 +99,11 @@ sys_trace(void)
   argint(0, &mask);
   return trace(mask);
 }
+
+uint64
+sys_sysinfo(void){
+  uint64 st; // user pointer to struct sysinfo
+
+  argaddr(0, &st);
+  return sinfo(st);
+}
